@@ -41,8 +41,7 @@
     .dec-card-title{font-size:16px;font-weight:700;color:var(--text-1)}
     .dec-card-preview{font-size:13px;color:var(--text-3);line-height:1.6;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;white-space:pre-wrap}
     .dec-card-date{font-size:12px;color:var(--text-3)}
-    .dec-card-actions{display:flex;gap:6px;padding-top:8px;border-top:1px solid var(--border-lt);opacity:0;transition:var(--ease)}
-    .dec-card:hover .dec-card-actions{opacity:1}
+    .dec-card-actions{display:flex;gap:6px;padding-top:8px;border-top:1px solid var(--border-lt)}
     /* 결정사항 모달 */
     .dec-overlay{position:fixed;inset:0;z-index:200;background:rgba(18,28,42,.45);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:20px}
     .dec-overlay.on{display:flex}
@@ -269,6 +268,24 @@
     </div>
   </div>
 </div>
+
+<!-- 결정사항 보기 모달 -->
+<div class="dec-overlay" id="decViewOverlay" onclick="closeDecView(event)">
+  <div class="dec-modal" style="max-width:680px">
+    <div class="dec-modal-head">
+      <div class="dec-modal-head-title" id="decViewTitle"></div>
+      <button class="modal-close" onclick="closeDecViewDirect()">&#x2715;</button>
+    </div>
+    <div class="dec-modal-body">
+      <div class="dec-card-date" id="decViewDate" style="margin-bottom:12px"></div>
+      <div id="decViewContent" style="font-size:15px;color:#465770;line-height:1.8;white-space:pre-wrap"></div>
+    </div>
+    <div class="dec-modal-foot">
+      <button class="btn btn-g" onclick="closeDecViewDirect()">닫기</button>
+      <button class="btn btn-o btn-sm" onclick="editFromView()">수정</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -442,7 +459,7 @@ function toast(msg){var el=document.getElementById('toast');el.textContent=msg;e
 
 
 /* ── 결정사항 ── */
-var decState = { decisions:[], editId:null };
+var decState = { decisions:[], editId:null, viewId:null };
 
 async function loadDecisions(){
   document.getElementById('decCards').innerHTML='<div class="spinner">불러오는 중...</div>';
