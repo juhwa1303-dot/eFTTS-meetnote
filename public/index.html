@@ -351,7 +351,7 @@ function renderDetail(id){
     '<div class="detail-doc"><div class="detail-doc-header">'+
     '<div class="detail-doc-title">'+esc(m.title)+'</div>'+
     '<div class="detail-doc-meta"><span>📅 '+fmtDate(m.date)+'</span>'+(m.attendees&&m.attendees.length?'<span>'+m.attendees.join(', ')+'</span>':'')+'</div>'+
-    (m.keywords&&m.keywords.length?'<div class="detail-kws">'+m.keywords.map(k=>'<span class="kw-chip">'+esc(k)+'</span>').join('')+'</div>':'')+
+    (m.keywords&&m.keywords.length?'<div style="margin-top:10px;color:var(--sky-dk);font-size:14px;font-weight:600">'+m.keywords.join(' · ')+'</div>':'')+
     '</div><div>'+sec('안건',m.agenda)+sec('주요 논의 내용',m.discussion)+sec('결정사항',m.decisions)+kwSec+'</div></div>';
 }
 
