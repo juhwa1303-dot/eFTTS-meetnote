@@ -209,16 +209,22 @@ const API='https://eftts-meetnote.onrender.com/api';
 const DEFAULT_ATT=['노환지','김진우','김주화'];
 let state={meetings:[],attendees:DEFAULT_ATT.map(n=>({name:n,checked:true})),editId:null,currentDetailId:null};
 
-function go(page,id){
+function go(page,id,push){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('on');
   var nb=document.getElementById('nav-'+page);if(nb)nb.classList.add('active');
   window.scrollTo(0,0);
+  if(push!==false)history.pushState({page:page,id:id||null},'','?p='+page+(id?'&id='+id:''));
   if(page==='list')loadList();
   if(page==='write')initWrite(id||null);
   if(page==='detail')renderDetail(id);
 }
+window.addEventListener('popstate',function(e){
+  var s=e.state;
+  if(s&&s.page)go(s.page,s.id||null,false);
+  else go('list',null,false);
+});
 
 function goListSave(){
   var title=document.getElementById('f-title').value.trim();
@@ -269,7 +275,7 @@ function renderList(data){
         <div class="m-card-title">${esc(m.title)}</div>
         <div class="m-card-date">${fmtShort(m.date)}</div>
       </div>
-      ${m.keywords&&m.keywords.length?'<div class="m-card-keywords">'+m.keywords.map(k=>'<span class="kw-chip">'+esc(k)+'</span>').join('')+'</div>':'<div style="height:4px"></div>'}
+      ${m.keywords&&m.keywords.length?'<div class="m-card-keywords">'+m.keywords.map(k=>'<span class="kw-chip">'+esc(k)+'</span>').join('')+'</div>':''}
       <div class="m-card-actions" onclick="event.stopPropagation()">
         <button class="btn btn-o btn-sm" onclick="go('detail','${m.id}')">보기</button>
         <button class="btn btn-g btn-sm" onclick="go('write','${m.id}')">수정</button>
@@ -340,13 +346,14 @@ function renderDetail(id){
   var m=state.meetings.find(x=>x.id===id);
   if(!m){go('list');return;}
   function sec(label,val){if(!val)return'';return'<div class="detail-sec"><div class="detail-sec-label">'+label+'</div><div class="detail-sec-val">'+esc(val)+'</div></div>';}
+  var kwSec=m.keywords&&m.keywords.length?sec('주요 키워드',m.keywords.join(', ')):''; 
   document.getElementById('detailContent').innerHTML=
     '<div class="detail-doc"><div class="detail-doc-header">'+
     '<div class="detail-doc-title">'+esc(m.title)+'</div>'+
     '<div class="detail-doc-meta"><span>📅 '+fmtDate(m.date)+'</span></div>'+
     (m.attendees&&m.attendees.length?'<div class="detail-atts">'+m.attendees.map(a=>'<span class="detail-att-chip">'+esc(a)+'</span>').join('')+'</div>':'')+
     (m.keywords&&m.keywords.length?'<div class="detail-kws">'+m.keywords.map(k=>'<span class="kw-chip">'+esc(k)+'</span>').join('')+'</div>':'')+
-    '</div><div>'+sec('안건',m.agenda)+sec('주요 논의 내용',m.discussion)+sec('결정사항',m.decisions)+'</div></div>';
+    '</div><div>'+sec('안건',m.agenda)+sec('주요 논의 내용',m.discussion)+sec('결정사항',m.decisions)+kwSec+'</div></div>';
 }
 
 function editCurrent(){go('write',state.currentDetailId);}
