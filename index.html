@@ -31,29 +31,6 @@
     .btn-g:hover{background:var(--border-lt)}
     .btn-d{background:transparent;color:var(--red);border:1.5px solid #FECACA}
     .btn-d:hover{background:var(--red-lt)}
-
-    /* 결정사항 */
-    .dec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap}
-    .dec-title{font-size:24px;font-weight:800;letter-spacing:-.4px}
-    .dec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    .dec-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-md);padding:20px;display:flex;flex-direction:column;gap:10px;transition:var(--ease)}
-    .dec-card:hover{box-shadow:var(--sh-md);border-color:var(--sky-mid)}
-    .dec-card-title{font-size:16px;font-weight:700;color:var(--text-1)}
-    .dec-card-preview{font-size:13px;color:var(--text-3);line-height:1.6;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
-    .dec-card-date{font-size:12px;color:var(--text-3)}
-    .dec-card-actions{display:flex;gap:6px;padding-top:8px;border-top:1px solid var(--border-lt);opacity:0;transition:var(--ease)}
-    .dec-card:hover .dec-card-actions{opacity:1}
-    /* 결정사항 모달 */
-    .dec-overlay{position:fixed;inset:0;z-index:200;background:rgba(18,28,42,.45);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:20px}
-    .dec-overlay.on{display:flex}
-    .dec-modal{background:var(--white);border-radius:var(--r-lg);width:100%;max-width:600px;max-height:88vh;overflow-y:auto;box-shadow:0 16px 60px rgba(18,28,42,.22);animation:popIn .2s ease}
-    @keyframes popIn{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
-    .dec-modal-head{padding:22px 24px 16px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .dec-modal-head-title{font-size:16px;font-weight:800}
-    .dec-modal-body{padding:20px 24px;display:flex;flex-direction:column;gap:14px}
-    .dec-modal-foot{padding:14px 24px;background:var(--bg);border-top:1px solid var(--border-lt);display:flex;justify-content:flex-end;gap:8px}
-    @media(max-width:900px){.dec-grid{grid-template-columns:repeat(2,1fr)}}
-    @media(max-width:600px){.dec-grid{grid-template-columns:1fr}.dec-card-actions{opacity:1}}
     .toast{position:fixed;bottom:24px;right:24px;background:var(--text-1);color:#fff;padding:12px 20px;border-radius:var(--r);font-size:14px;font-weight:500;box-shadow:var(--sh-md);z-index:9999;opacity:0;transform:translateY(12px);pointer-events:none;transition:.2s ease}
     .toast.on{opacity:1;transform:translateY(0)}
     .list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap}
@@ -129,7 +106,6 @@
     <nav class="nav">
       <button class="nav-btn" id="nav-list" onclick="go('list')">회의록 목록</button>
       <button class="nav-btn" id="nav-write" onclick="go('write')">새 회의록</button>
-      <button class="nav-btn" id="nav-decisions" onclick="go('decisions')">결정사항</button>
     </nav>
   </div>
 </header>
@@ -226,48 +202,6 @@
   </div>
 </div>
 
-
-<!-- 결정사항 페이지 -->
-<div id="page-decisions" class="page">
-  <div class="wrap">
-    <div class="dec-header">
-      <div><div class="dec-title">결정사항</div></div>
-      <button class="btn btn-p" onclick="openDecModal()">+ 추가</button>
-    </div>
-    <div class="search-row">
-      <div class="search-wrap">
-        <span class="search-ic">🔍</span>
-        <input class="search-inp" id="decSearchInp" type="text" placeholder="제목 검색..." oninput="filterDecisions()" />
-      </div>
-    </div>
-    <div class="list-count" id="decCount"></div>
-    <div class="dec-grid" id="decCards"><div class="spinner">불러오는 중...</div></div>
-  </div>
-</div>
-
-<!-- 결정사항 작성/수정 모달 -->
-<div class="dec-overlay" id="decOverlay" onclick="closeDecModal(event)">
-  <div class="dec-modal">
-    <div class="dec-modal-head">
-      <div class="dec-modal-head-title" id="decModalTitle">결정사항 추가</div>
-      <button class="modal-close" onclick="closeDecModalDirect()">✕</button>
-    </div>
-    <div class="dec-modal-body">
-      <div class="fgroup">
-        <label class="flabel">제목 <span class="req">*</span></label>
-        <input class="finput" id="dec-title" type="text" placeholder="결정사항 제목을 입력하세요" />
-      </div>
-      <div class="fgroup">
-        <label class="flabel">내용</label>
-        <textarea class="finput" id="dec-content" rows="8" placeholder="결정된 내용을 자세히 작성하세요"></textarea>
-      </div>
-    </div>
-    <div class="dec-modal-foot">
-      <button class="btn btn-g" onclick="closeDecModalDirect()">취소</button>
-      <button class="btn btn-p" onclick="saveDecision()">저장하기</button>
-    </div>
-  </div>
-</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -285,7 +219,6 @@ function go(page,id,push){
   if(page==='list')loadList();
   if(page==='write')initWrite(id||null);
   if(page==='detail')renderDetail(id);
-  if(page==='decisions')loadDecisions();
 }
 window.addEventListener('popstate',function(e){
   var s=e.state;
@@ -439,93 +372,6 @@ function esc(str){if(!str)return'';return str.replace(/&/g,'&amp;').replace(/</g
 var toastTid;
 function toast(msg){var el=document.getElementById('toast');el.textContent=msg;el.classList.add('on');clearTimeout(toastTid);toastTid=setTimeout(function(){el.classList.remove('on');},2600);}
 
-
-/* ── 결정사항 ── */
-var decState = { decisions:[], editId:null };
-
-async function loadDecisions(){
-  document.getElementById('decCards').innerHTML='<div class="spinner">불러오는 중...</div>';
-  try{
-    var res=await fetch(API+'/decisions');
-    decState.decisions=await res.json();
-    filterDecisions();
-  }catch(e){
-    document.getElementById('decCards').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><p>서버에 연결할 수 없습니다</p></div>';
-  }
-}
-
-function filterDecisions(){
-  var q=document.getElementById('decSearchInp').value.toLowerCase();
-  var filtered=decState.decisions.filter(d=>!q||d.title&&d.title.toLowerCase().includes(q));
-  renderDecisions(filtered);
-}
-
-function renderDecisions(data){
-  document.getElementById('decCount').innerHTML='총 <strong>'+data.length+'개</strong>';
-  var grid=document.getElementById('decCards');
-  if(!data.length){grid.innerHTML='<div class="empty" style="grid-column:span 3"><div class="empty-icon">📋</div><p>결정사항이 없습니다</p><span>추가 버튼을 눌러 작성해보세요</span></div>';return;}
-  grid.innerHTML=data.map(d=>`
-    <div class="dec-card">
-      <div class="dec-card-title">${esc(d.title)}</div>
-      ${d.content?'<div class="dec-card-preview">'+esc(d.content)+'</div>':''}
-      <div class="dec-card-date">수정일: ${fmtDate(d.updatedAt?d.updatedAt.slice(0,10):d.createdAt?d.createdAt.slice(0,10):'')}</div>
-      <div class="dec-card-actions">
-        <button class="btn btn-o btn-sm" onclick="openDecModal('${d.id}')">수정</button>
-        <button class="btn btn-d btn-sm" onclick="deleteDecision('${d.id}')">삭제</button>
-      </div>
-    </div>`).join('');
-}
-
-function openDecModal(id){
-  decState.editId=id||null;
-  document.getElementById('decModalTitle').textContent=id?'결정사항 수정':'결정사항 추가';
-  document.getElementById('dec-title').value='';
-  document.getElementById('dec-content').value='';
-  if(id){
-    var d=decState.decisions.find(x=>x.id===id);
-    if(d){
-      document.getElementById('dec-title').value=d.title||'';
-      document.getElementById('dec-content').value=d.content||'';
-    }
-  }
-  document.getElementById('decOverlay').classList.add('on');
-  document.body.style.overflow='hidden';
-  setTimeout(function(){document.getElementById('dec-title').focus();},100);
-}
-
-function closeDecModal(e){
-  if(e.target===document.getElementById('decOverlay'))closeDecModalDirect();
-}
-function closeDecModalDirect(){
-  document.getElementById('decOverlay').classList.remove('on');
-  document.body.style.overflow='';
-}
-
-async function saveDecision(){
-  var title=document.getElementById('dec-title').value.trim();
-  if(!title){toast('⚠️ 제목을 입력해주세요.');document.getElementById('dec-title').focus();return;}
-  var payload={title:title,content:document.getElementById('dec-content').value.trim()};
-  try{
-    if(decState.editId){
-      await fetch(API+'/decisions/'+decState.editId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-      toast('✓ 수정되었습니다.');
-    }else{
-      await fetch(API+'/decisions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-      toast('✓ 저장되었습니다.');
-    }
-    closeDecModalDirect();
-    await loadDecisions();
-  }catch(e){toast('❌ 저장 실패');}
-}
-
-async function deleteDecision(id){
-  if(!confirm('삭제하시겠습니까?'))return;
-  try{
-    await fetch(API+'/decisions/'+id,{method:'DELETE'});
-    toast('삭제되었습니다.');
-    await loadDecisions();
-  }catch(e){toast('❌ 삭제 실패');}
-}
 window.addEventListener('beforeunload',function(){
   var page=document.querySelector('.page.on');
   if(page&&page.id==='page-write'){var title=document.getElementById('f-title').value.trim();if(title)saveMeeting(true);}

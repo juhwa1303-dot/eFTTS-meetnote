@@ -68,3 +68,45 @@ app.delete('/api/meetings/:id', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`✅ MeetNote 서버 실행 중 → http://localhost:${PORT}`);
 });
+
+// ── 결정사항 스키마 ──────────────────────────
+const decisionSchema = new mongoose.Schema({
+  title:     { type: String, required: true },
+  content:   String,
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+const Decision = mongoose.model('Decision', decisionSchema);
+
+// 결정사항 전체 목록
+app.get('/api/decisions', async (req, res) => {
+  try {
+    const data = await Decision.find().sort({ updatedAt: -1 });
+    res.json(data.map(d => ({ ...d.toObject(), id: d._id.toString() })));
+  } catch(e) { res.status(500).json({ error: '조회 실패' }); }
+});
+
+// 결정사항 저장
+app.post('/api/decisions', async (req, res) => {
+  try {
+    const d = await Decision.create(req.body);
+    res.status(201).json({ ...d.toObject(), id: d._id.toString() });
+  } catch(e) { res.status(500).json({ error: '저장 실패' }); }
+});
+
+// 결정사항 수정
+app.put('/api/decisions/:id', async (req, res) => {
+  try {
+    const d = await Decision.findByIdAndUpdate(req.params.id, { ...req.body, updatedAt: new Date() }, { new: true });
+    if (!d) return res.status(404).json({ error: '찾을 수 없습니다.' });
+    res.json({ ...d.toObject(), id: d._id.toString() });
+  } catch(e) { res.status(500).json({ error: '수정 실패' }); }
+});
+
+// 결정사항 삭제
+app.delete('/api/decisions/:id', async (req, res) => {
+  try {
+    await Decision.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: '삭제 실패' }); }
+});
