@@ -350,8 +350,7 @@ function renderDetail(id){
   document.getElementById('detailContent').innerHTML=
     '<div class="detail-doc"><div class="detail-doc-header">'+
     '<div class="detail-doc-title">'+esc(m.title)+'</div>'+
-    '<div class="detail-doc-meta"><span>📅 '+fmtDate(m.date)+'</span></div>'+
-    (m.attendees&&m.attendees.length?'<div class="detail-atts">'+m.attendees.map(a=>'<span class="detail-att-chip">'+esc(a)+'</span>').join('')+'</div>':'')+
+    '<div class="detail-doc-meta"><span>📅 '+fmtDate(m.date)+'</span>'+(m.attendees&&m.attendees.length?'<span>'+m.attendees.join(', ')+'</span>':'')+'</div>'+
     (m.keywords&&m.keywords.length?'<div class="detail-kws">'+m.keywords.map(k=>'<span class="kw-chip">'+esc(k)+'</span>').join('')+'</div>':'')+
     '</div><div>'+sec('안건',m.agenda)+sec('주요 논의 내용',m.discussion)+sec('결정사항',m.decisions)+kwSec+'</div></div>';
 }
