@@ -39,7 +39,7 @@
     .dec-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-md);padding:20px;display:flex;flex-direction:column;gap:10px;transition:var(--ease)}
     .dec-card:hover{box-shadow:var(--sh-md);border-color:var(--sky-mid)}
     .dec-card-title{font-size:16px;font-weight:700;color:var(--text-1)}
-    .dec-card-preview{font-size:13px;color:var(--text-3);line-height:1.6;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+    .dec-card-preview{font-size:13px;color:var(--text-3);line-height:1.6;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;white-space:pre-wrap}
     .dec-card-date{font-size:12px;color:var(--text-3)}
     .dec-card-actions{display:flex;gap:6px;padding-top:8px;border-top:1px solid var(--border-lt);opacity:0;transition:var(--ease)}
     .dec-card:hover .dec-card-actions{opacity:1}
@@ -52,6 +52,7 @@
     .dec-modal-head-title{font-size:16px;font-weight:800}
     .dec-modal-body{padding:20px 24px;display:flex;flex-direction:column;gap:14px}
     .dec-modal-foot{padding:14px 24px;background:var(--bg);border-top:1px solid var(--border-lt);display:flex;justify-content:flex-end;gap:8px}
+    .dec-view-val{font-size:15px;color:var(--text-2);line-height:1.8;white-space:pre-wrap;padding:4px 0}
     @media(max-width:900px){.dec-grid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:600px){.dec-grid{grid-template-columns:1fr}.dec-card-actions{opacity:1}}
     .toast{position:fixed;bottom:24px;right:24px;background:var(--text-1);color:#fff;padding:12px 20px;border-radius:var(--r);font-size:14px;font-weight:500;box-shadow:var(--sh-md);z-index:9999;opacity:0;transform:translateY(12px);pointer-events:none;transition:.2s ease}
@@ -470,7 +471,8 @@ function renderDecisions(data){
       ${d.content?'<div class="dec-card-preview">'+esc(d.content)+'</div>':''}
       <div class="dec-card-date">수정일: ${fmtDate(d.updatedAt?d.updatedAt.slice(0,10):d.createdAt?d.createdAt.slice(0,10):'')}</div>
       <div class="dec-card-actions">
-        <button class="btn btn-o btn-sm" onclick="openDecModal('${d.id}')">수정</button>
+        <button class="btn btn-o btn-sm" onclick="viewDecision('${d.id}')">보기</button>
+        <button class="btn btn-g btn-sm" onclick="openDecModal('${d.id}')">수정</button>
         <button class="btn btn-d btn-sm" onclick="deleteDecision('${d.id}')">삭제</button>
       </div>
     </div>`).join('');
@@ -517,6 +519,21 @@ async function saveDecision(){
     await loadDecisions();
   }catch(e){toast('❌ 저장 실패');}
 }
+
+function viewDecision(id){
+  var d=decState.decisions.find(x=>x.id===id);
+  if(!d)return;
+  document.getElementById('decViewTitle').textContent=d.title||'';
+  document.getElementById('decViewContent').textContent=d.content||'';
+  var dateStr=d.updatedAt?d.updatedAt.slice(0,10):d.createdAt?d.createdAt.slice(0,10):'';
+  document.getElementById('decViewDate').textContent='수정일: '+fmtDate(dateStr);
+  decState.viewId=id;
+  document.getElementById('decViewOverlay').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closeDecView(e){if(e.target===document.getElementById('decViewOverlay'))closeDecViewDirect();}
+function closeDecViewDirect(){document.getElementById('decViewOverlay').classList.remove('on');document.body.style.overflow='';}
+function editFromView(){closeDecViewDirect();openDecModal(decState.viewId);}
 
 async function deleteDecision(id){
   if(!confirm('삭제하시겠습니까?'))return;
