@@ -54,6 +54,11 @@
     .dec-view-val{font-size:15px;color:var(--text-2);line-height:1.8;white-space:pre-wrap;padding:4px 0}
     @media(max-width:900px){.dec-grid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:600px){.dec-grid{grid-template-columns:1fr}.dec-card-actions{opacity:1}}
+
+    .textarea-wrap{display:flex;flex-direction:column;gap:4px}
+    .textarea-toolbar{display:flex;gap:6px}
+    .toolbar-btn{padding:3px 10px;border-radius:var(--r);font-size:12px;font-weight:600;color:var(--sky-dk);border:1.5px solid var(--sky-mid);background:var(--white);cursor:pointer;transition:var(--ease)}
+    .toolbar-btn:hover{background:var(--sky-lt)}
     .toast{position:fixed;bottom:24px;right:24px;background:var(--text-1);color:#fff;padding:12px 20px;border-radius:var(--r);font-size:14px;font-weight:500;box-shadow:var(--sh-md);z-index:9999;opacity:0;transform:translateY(12px);pointer-events:none;transition:.2s ease}
     .toast.on{opacity:1;transform:translateY(0)}
     .list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap}
@@ -193,11 +198,21 @@
           </div>
           <div class="fgroup">
             <label class="flabel">주요 논의 내용</label>
-            <textarea class="finput" id="f-discussion" rows="6" placeholder="회의에서 논의된 주요 내용을 기록하세요"></textarea>
+            <div class="textarea-wrap">
+              <div class="textarea-toolbar">
+                <button type="button" class="toolbar-btn" onclick="insertDivider('f-discussion')">── 구분선</button>
+              </div>
+              <textarea class="finput" id="f-discussion" rows="6" placeholder="회의에서 논의된 주요 내용을 기록하세요"></textarea>
+            </div>
           </div>
           <div class="fgroup">
             <label class="flabel">결정사항</label>
-            <textarea class="finput" id="f-decisions" rows="4" placeholder="회의에서 결정된 사항을 기록하세요"></textarea>
+            <div class="textarea-wrap">
+              <div class="textarea-toolbar">
+                <button type="button" class="toolbar-btn" onclick="insertDivider('f-decisions')">── 구분선</button>
+              </div>
+              <textarea class="finput" id="f-decisions" rows="4" placeholder="회의에서 결정된 사항을 기록하세요"></textarea>
+            </div>
           </div>
           <div class="fgroup">
             <label class="flabel">주요 키워드</label>
@@ -259,7 +274,12 @@
       </div>
       <div class="fgroup">
         <label class="flabel">내용</label>
-        <textarea class="finput" id="dec-content" rows="8" placeholder="결정된 내용을 자세히 작성하세요"></textarea>
+        <div class="textarea-wrap">
+          <div class="textarea-toolbar">
+            <button type="button" class="toolbar-btn" onclick="insertDivider('dec-content')">── 구분선</button>
+          </div>
+          <textarea class="finput" id="dec-content" rows="8" placeholder="결정된 내용을 자세히 작성하세요"></textarea>
+        </div>
       </div>
     </div>
     <div class="dec-modal-foot">
@@ -430,7 +450,7 @@ function renderDetail(id){
   state.currentDetailId=id;
   var m=state.meetings.find(x=>x.id===id);
   if(!m){go('list');return;}
-  function sec(label,val){if(!val)return'';var rendered=esc(val).replace(/^---$/gm,'<hr style="border:none;border-top:1.5px solid #DDE8F2;margin:10px 0">');return'<div class="detail-sec"><div class="detail-sec-label">'+label+'</div><div class="detail-sec-val">'+rendered+'</div></div>';}
+  function sec(label,val){if(!val)return'';var rendered=esc(val).replace(/────────────────/g,'<hr style="border:none;border-top:1.5px solid #DDE8F2;margin:10px 0">');return'<div class="detail-sec"><div class="detail-sec-label">'+label+'</div><div class="detail-sec-val">'+rendered+'</div></div>';}
   var kwSec=m.keywords&&m.keywords.length?sec('주요 키워드',m.keywords.join(', ')):''; 
   document.getElementById('detailContent').innerHTML=
     '<div class="detail-doc"><div class="detail-doc-header">'+
@@ -541,7 +561,7 @@ function viewDecision(id){
   var d=decState.decisions.find(x=>x.id===id);
   if(!d)return;
   document.getElementById('decViewTitle').textContent=d.title||'';
-  var decContent=esc(d.content||'').replace(/^---$/gm,'<hr style="border:none;border-top:1.5px solid #DDE8F2;margin:10px 0">');  document.getElementById('decViewContent').innerHTML=decContent;
+  var decContent=esc(d.content||'').replace(/────────────────/g,'<hr style="border:none;border-top:1.5px solid #DDE8F2;margin:10px 0">');document.getElementById('decViewContent').innerHTML=decContent;
   var dateStr=d.updatedAt?d.updatedAt.slice(0,10):d.createdAt?d.createdAt.slice(0,10):'';
   document.getElementById('decViewDate').textContent='수정일: '+fmtDate(dateStr);
   decState.viewId=id;
@@ -559,6 +579,19 @@ async function deleteDecision(id){
     toast('삭제되었습니다.');
     await loadDecisions();
   }catch(e){toast('❌ 삭제 실패');}
+}
+
+function insertDivider(id){
+  var ta=document.getElementById(id);
+  var start=ta.selectionStart;
+  var end=ta.selectionEnd;
+  var before=ta.value.substring(0,start);
+  var after=ta.value.substring(end);
+  var divider=(before.length===0||before.endsWith('\n'))?'\n────────────────\n':'\n\n────────────────\n';
+  ta.value=before+divider+after;
+  var pos=before.length+divider.length;
+  ta.selectionStart=ta.selectionEnd=pos;
+  ta.focus();
 }
 window.addEventListener('beforeunload',function(){
   var page=document.querySelector('.page.on');
