@@ -430,7 +430,7 @@ function renderDetail(id){
   state.currentDetailId=id;
   var m=state.meetings.find(x=>x.id===id);
   if(!m){go('list');return;}
-  function sec(label,val){if(!val)return'';return'<div class="detail-sec"><div class="detail-sec-label">'+label+'</div><div class="detail-sec-val">'+esc(val)+'</div></div>';}
+  function sec(label,val){if(!val)return'';var rendered=esc(val).replace(/^---$/gm,'<hr style="border:none;border-top:1.5px solid #DDE8F2;margin:10px 0">');return'<div class="detail-sec"><div class="detail-sec-label">'+label+'</div><div class="detail-sec-val">'+rendered+'</div></div>';}
   var kwSec=m.keywords&&m.keywords.length?sec('주요 키워드',m.keywords.join(', ')):''; 
   document.getElementById('detailContent').innerHTML=
     '<div class="detail-doc"><div class="detail-doc-header">'+
@@ -541,7 +541,7 @@ function viewDecision(id){
   var d=decState.decisions.find(x=>x.id===id);
   if(!d)return;
   document.getElementById('decViewTitle').textContent=d.title||'';
-  document.getElementById('decViewContent').textContent=d.content||'';
+  var decContent=esc(d.content||'').replace(/^---$/gm,'<hr style="border:none;border-top:1.5px solid #DDE8F2;margin:10px 0">');  document.getElementById('decViewContent').innerHTML=decContent;
   var dateStr=d.updatedAt?d.updatedAt.slice(0,10):d.createdAt?d.createdAt.slice(0,10):'';
   document.getElementById('decViewDate').textContent='수정일: '+fmtDate(dateStr);
   decState.viewId=id;
