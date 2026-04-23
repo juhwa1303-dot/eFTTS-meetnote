@@ -113,13 +113,13 @@
     .detail-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px}
     .detail-actions{display:flex;gap:8px}
     .detail-doc{background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh);overflow:hidden}
-    .detail-doc-header{padding:32px 36px 26px;border-bottom:1px solid var(--border-lt);background:linear-gradient(135deg,#F6FBFF 0%,#fff 100%)}
+    .detail-doc-header{padding:32px 36px 26px;border-bottom:2px solid #C8D8E8;background:linear-gradient(135deg,#F6FBFF 0%,#fff 100%)}
     .detail-doc-title{font-size:26px;font-weight:800;letter-spacing:-.4px;margin-bottom:10px}
     .detail-doc-meta{display:flex;gap:16px;font-size:14px;color:var(--text-3);flex-wrap:wrap}
     .detail-atts{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
     .detail-att-chip{background:var(--sky-lt);color:var(--sky-dk);padding:3px 12px;border-radius:20px;font-size:13px;font-weight:600}
     .detail-kws{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-    .detail-sec{padding:22px 36px;border-bottom:1px solid var(--border-lt)}
+    .detail-sec{padding:22px 36px;border-bottom:2px solid #C8D8E8}
     .detail-sec:last-child{border-bottom:none}
     .detail-sec-label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--sky-dk);margin-bottom:10px}
     .detail-sec-val{font-size:15px;color:var(--text-2);line-height:1.8;white-space:pre-wrap}
@@ -450,7 +450,7 @@ function renderDetail(id){
   state.currentDetailId=id;
   var m=state.meetings.find(x=>x.id===id);
   if(!m){go('list');return;}
-  function sec(label,val){if(!val)return'';var rendered=esc(val).replace(/────────────────/g,'<hr style="border:none;border-top:1.5px solid #DDE8F2;margin:10px 0">');return'<div class="detail-sec"><div class="detail-sec-label">'+label+'</div><div class="detail-sec-val">'+rendered+'</div></div>';}
+  function sec(label,val){if(!val)return'';var rendered=esc(val).replace(/────────────────/g,'<hr style="border:none;border-top:2px solid #8A9BB0;margin:12px 0">');return'<div class="detail-sec"><div class="detail-sec-label">'+label+'</div><div class="detail-sec-val">'+rendered+'</div></div>';}
   var kwSec=m.keywords&&m.keywords.length?sec('주요 키워드',m.keywords.join(', ')):''; 
   document.getElementById('detailContent').innerHTML=
     '<div class="detail-doc"><div class="detail-doc-header">'+
@@ -561,7 +561,7 @@ function viewDecision(id){
   var d=decState.decisions.find(x=>x.id===id);
   if(!d)return;
   document.getElementById('decViewTitle').textContent=d.title||'';
-  var decContent=esc(d.content||'').replace(/────────────────/g,'<hr style="border:none;border-top:1.5px solid #DDE8F2;margin:10px 0">');document.getElementById('decViewContent').innerHTML=decContent;
+  var decContent=esc(d.content||'').replace(/────────────────/g,'<hr style="border:none;border-top:2px solid #8A9BB0;margin:12px 0">');document.getElementById('decViewContent').innerHTML=decContent;
   var dateStr=d.updatedAt?d.updatedAt.slice(0,10):d.createdAt?d.createdAt.slice(0,10):'';
   document.getElementById('decViewDate').textContent='수정일: '+fmtDate(dateStr);
   decState.viewId=id;
