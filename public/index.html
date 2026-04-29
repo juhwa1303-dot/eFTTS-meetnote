@@ -247,7 +247,10 @@
   <div class="wrap">
     <div class="dec-header">
       <div><div class="dec-title">결정사항</div></div>
-      <button class="btn btn-p" onclick="openDecModal()">+ 추가</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-o" onclick="go('decisions-all')">전체보기</button>
+        <button class="btn btn-p" onclick="openDecModal()">+ 추가</button>
+      </div>
     </div>
     <div class="search-row">
       <div class="search-wrap">
@@ -289,6 +292,17 @@
   </div>
 </div>
 
+
+<!-- 결정사항 전체보기 페이지 -->
+<div id="page-decisions-all" class="page">
+  <div class="wrap" style="max-width:860px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px">
+      <div style="font-size:24px;font-weight:800;letter-spacing:-.4px">결정사항 전체보기</div>
+      <button class="btn btn-g" onclick="go('decisions')">← 목록으로</button>
+    </div>
+    <div id="decAllContent"></div>
+  </div>
+</div>
 <!-- 결정사항 보기 모달 -->
 <div class="dec-overlay" id="decViewOverlay" onclick="closeDecView(event)">
   <div class="dec-modal" style="max-width:680px">
@@ -324,6 +338,7 @@ function go(page,id,push){
   if(page==='write')initWrite(id||null);
   if(page==='detail')renderDetail(id);
   if(page==='decisions')loadDecisions();
+  if(page==='decisions-all')loadDecisionsAll();
 }
 window.addEventListener('popstate',function(e){
   var s=e.state;
@@ -592,6 +607,38 @@ function insertDivider(id){
   var pos=before.length+divider.length;
   ta.selectionStart=ta.selectionEnd=pos;
   ta.focus();
+}
+
+async function loadDecisionsAll(){
+  var el=document.getElementById('decAllContent');
+  el.innerHTML='<div class="spinner">불러오는 중...</div>';
+  try{
+    // 이미 로드된 데이터 있으면 재사용, 없으면 fetch
+    if(!decState.decisions.length){
+      var res=await fetch(API+'/decisions');
+      decState.decisions=await res.json();
+    }
+    renderDecisionsAll(decState.decisions);
+  }catch(e){
+    el.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><p>서버에 연결할 수 없습니다</p></div>';
+  }
+}
+
+function renderDecisionsAll(data){
+  var el=document.getElementById('decAllContent');
+  if(!data.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><p>결정사항이 없습니다</p></div>';
+    return;
+  }
+  el.innerHTML=data.map((d,i)=>{
+    var divider=i<data.length-1?'<hr style="border:none;border-top:2px solid #C8D8E8;margin:32px 0">':'';
+    var content=d.content?esc(d.content).replace(/────────────────/g,'<hr style="border:none;border-top:2px solid #8A9BB0;margin:12px 0">'):'';
+    return '<div>'+
+      '<div style="font-size:20px;font-weight:800;letter-spacing:-.3px;color:#18242F">'+esc(d.title)+'</div>'+
+      '<div style="height:16px"></div>'+
+      (content?'<div style="font-size:15px;color:#465770;line-height:1.8;white-space:pre-wrap">'+content+'</div>':'')+
+      '</div>'+divider;
+  }).join('');
 }
 window.addEventListener('beforeunload',function(){
   var page=document.querySelector('.page.on');
