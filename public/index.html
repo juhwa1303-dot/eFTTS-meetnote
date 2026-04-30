@@ -404,7 +404,7 @@ function renderList(data){
     </div>`).join('');
 }
 
-function initWrite(editId){
+async function initWrite(editId){
   state.editId=editId||null;
   state.attendees=DEFAULT_ATT.map(n=>({name:n,checked:true}));
   document.getElementById('writePageTitle').textContent=editId?'회의록 수정':'새 회의록 작성';
@@ -413,6 +413,12 @@ function initWrite(editId){
   renderAttendees();
   if(editId){
     var m=state.meetings.find(x=>x.id===editId);
+    if(!m){
+      try{
+        var res=await fetch(API+'/meetings/'+editId);
+        if(res.ok) m=await res.json();
+      }catch(e){}
+    }
     if(m){
       document.getElementById('f-title').value=m.title||'';
       document.getElementById('f-date').value=m.date||today();
@@ -461,12 +467,18 @@ async function saveMeeting(silent){
   }catch(e){if(!silent)toast('❌ 저장 실패');else go('list');}
 }
 
-function renderDetail(id){
+async function renderDetail(id){
   state.currentDetailId=id;
   var m=state.meetings.find(x=>x.id===id);
-  if(!m){go('list');return;}
+  if(!m){
+    try{
+      var res=await fetch(API+'/meetings/'+id);
+      if(!res.ok){go('list');return;}
+      m=await res.json();
+    }catch(e){go('list');return;}
+  }
   function sec(label,val){if(!val)return'';var rendered=esc(val).replace(/────────────────/g,'<hr style="border:none;border-top:2px solid #8A9BB0;margin:12px 0">');return'<div class="detail-sec"><div class="detail-sec-label">'+label+'</div><div class="detail-sec-val">'+rendered+'</div></div>';}
-  var kwSec=m.keywords&&m.keywords.length?sec('주요 키워드',m.keywords.join(', ')):''; 
+  var kwSec=m.keywords&&m.keywords.length?sec('주요 키워드',m.keywords.join(', ')):'';
   document.getElementById('detailContent').innerHTML=
     '<div class="detail-doc"><div class="detail-doc-header">'+
     '<div class="detail-doc-title">'+esc(m.title)+'</div>'+
@@ -644,7 +656,12 @@ window.addEventListener('beforeunload',function(){
   var page=document.querySelector('.page.on');
   if(page&&page.id==='page-write'){var title=document.getElementById('f-title').value.trim();if(title)saveMeeting(true);}
 });
-window.addEventListener('DOMContentLoaded',function(){go('list');});
+window.addEventListener('DOMContentLoaded',function(){
+  var params=new URLSearchParams(location.search);
+  var page=params.get('p')||'list';
+  var id=params.get('id')||null;
+  go(page,id,false);
+});
 </script>
 </body>
 </html>
