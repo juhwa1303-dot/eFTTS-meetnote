@@ -59,6 +59,17 @@
     .textarea-toolbar{display:flex;gap:6px}
     .toolbar-btn{padding:3px 10px;border-radius:var(--r);font-size:12px;font-weight:600;color:var(--sky-dk);border:1.5px solid var(--sky-mid);background:var(--white);cursor:pointer;transition:var(--ease)}
     .toolbar-btn:hover{background:var(--sky-lt)}
+
+    .view-toggle{display:flex;gap:6px;background:var(--bg);border-radius:var(--r);padding:3px}
+    .toggle-btn{padding:5px 14px;border-radius:6px;font-size:13px;font-weight:600;color:var(--text-3);border:none;background:transparent;cursor:pointer;transition:var(--ease)}
+    .toggle-btn.active{background:var(--white);color:var(--sky-dk);box-shadow:var(--sh-sm)}
+    .dec-table{width:100%;border-collapse:collapse;background:var(--white);border-radius:var(--r-md);overflow:hidden;border:1px solid var(--border)}
+    .dec-table th{padding:12px 18px;background:var(--bg);font-size:12px;font-weight:800;color:var(--text-3);text-align:left;border-bottom:2px solid #C8D8E8;letter-spacing:.04em;text-transform:uppercase}
+    .dec-table td{padding:14px 18px;font-size:14px;color:var(--text-2);border-bottom:1px solid var(--border-lt);vertical-align:top}
+    .dec-table tr:last-child td{border-bottom:none}
+    .dec-table tr:hover td{background:var(--sky-lt);cursor:pointer}
+    .dec-table .td-title{font-weight:700;color:var(--text-1);width:200px;flex-shrink:0}
+    .dec-table .td-content{color:var(--text-2);white-space:pre-wrap;max-height:60px;overflow:hidden;text-overflow:ellipsis}
     .toast{position:fixed;bottom:24px;right:24px;background:var(--text-1);color:#fff;padding:12px 20px;border-radius:var(--r);font-size:14px;font-weight:500;box-shadow:var(--sh-md);z-index:9999;opacity:0;transform:translateY(12px);pointer-events:none;transition:.2s ease}
     .toast.on{opacity:1;transform:translateY(0)}
     .list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap}
@@ -133,8 +144,8 @@
     <div class="logo" onclick="go('list')"><span class="logo-mark">M</span>eFTTS MeetNote</div>
     <nav class="nav">
       <button class="nav-btn" id="nav-list" onclick="go('list')">회의록 목록</button>
-      <button class="nav-btn" id="nav-write" onclick="go('write')">새 회의록</button>
       <button class="nav-btn" id="nav-decisions" onclick="go('decisions')">결정사항</button>
+      <button class="nav-btn" id="nav-pending" onclick="go('pending')">미확정</button>
     </nav>
   </div>
 </header>
@@ -232,10 +243,6 @@
   <div class="wrap">
     <div class="detail-topbar">
       <button class="btn btn-g" onclick="go('list')">← 목록으로</button>
-      <div class="detail-actions">
-        <button class="btn btn-o btn-sm" onclick="editCurrent()">수정</button>
-        <button class="btn btn-d btn-sm" onclick="deleteCurrent()">삭제</button>
-      </div>
     </div>
     <div id="detailContent"></div>
   </div>
@@ -247,7 +254,11 @@
   <div class="wrap">
     <div class="dec-header">
       <div><div class="dec-title">결정사항</div></div>
-      <div style="display:flex;gap:8px">
+      <div style="display:flex;gap:10px;align-items:center">
+        <div class="view-toggle">
+          <button class="toggle-btn active" id="dec-toggle-card" onclick="setDecView('card')">카드</button>
+          <button class="toggle-btn" id="dec-toggle-list" onclick="setDecView('list')">목록</button>
+        </div>
         <button class="btn btn-o" onclick="go('decisions-all')">전체보기</button>
         <button class="btn btn-p" onclick="openDecModal()">+ 추가</button>
       </div>
@@ -314,9 +325,97 @@
       <div class="dec-card-date" id="decViewDate" style="margin-bottom:12px"></div>
       <div id="decViewContent" style="font-size:15px;color:#465770;line-height:1.8;white-space:pre-wrap"></div>
     </div>
+    <div class="dec-modal-foot" style="justify-content:space-between">
+      <button class="btn btn-d btn-sm" onclick="deleteFromView()">삭제</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-g" onclick="closeDecViewDirect()">닫기</button>
+        <button class="btn btn-o btn-sm" onclick="editFromView()">수정</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 미확정 페이지 -->
+<div id="page-pending" class="page">
+  <div class="wrap">
+    <div class="dec-header">
+      <div><div class="dec-title">미확정</div></div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div class="view-toggle">
+          <button class="toggle-btn active" id="pend-toggle-card" onclick="setPendView('card')">카드</button>
+          <button class="toggle-btn" id="pend-toggle-list" onclick="setPendView('list')">목록</button>
+        </div>
+        <button class="btn btn-o" onclick="go('pending-all')">전체보기</button>
+        <button class="btn btn-p" onclick="openPendModal()">+ 추가</button>
+      </div>
+    </div>
+    <div class="search-row">
+      <div class="search-wrap">
+        <span class="search-ic">🔍</span>
+        <input class="search-inp" id="pendSearchInp" type="text" placeholder="제목 검색..." oninput="filterPending()" />
+      </div>
+    </div>
+    <div class="list-count" id="pendCount"></div>
+    <div class="dec-grid" id="pendCards"><div class="spinner">불러오는 중...</div></div>
+  </div>
+</div>
+
+<!-- 미확정 전체보기 페이지 -->
+<div id="page-pending-all" class="page">
+  <div class="wrap" style="max-width:860px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px">
+      <div style="font-size:24px;font-weight:800;letter-spacing:-.4px">미확정 전체보기</div>
+      <button class="btn btn-g" onclick="go('pending')">← 목록으로</button>
+    </div>
+    <div id="pendAllContent"></div>
+  </div>
+</div>
+
+<!-- 미확정 작성/수정 모달 -->
+<div class="dec-overlay" id="pendOverlay" onclick="closePendModal(event)">
+  <div class="dec-modal">
+    <div class="dec-modal-head">
+      <div class="dec-modal-head-title" id="pendModalTitle">미확정 추가</div>
+      <button class="modal-close" onclick="closePendModalDirect()">&#x2715;</button>
+    </div>
+    <div class="dec-modal-body">
+      <div class="fgroup">
+        <label class="flabel">제목 <span class="req">*</span></label>
+        <input class="finput" id="pend-title" type="text" placeholder="미확정 항목 제목" />
+      </div>
+      <div class="fgroup">
+        <label class="flabel">내용</label>
+        <div class="textarea-wrap">
+          <div class="textarea-toolbar">
+            <button type="button" class="toolbar-btn" onclick="insertDivider('pend-content')">── 구분선</button>
+          </div>
+          <textarea class="finput" id="pend-content" rows="8" placeholder="미확정 내용을 작성하세요"></textarea>
+        </div>
+      </div>
+    </div>
     <div class="dec-modal-foot">
-      <button class="btn btn-g" onclick="closeDecViewDirect()">닫기</button>
-      <button class="btn btn-o btn-sm" onclick="editFromView()">수정</button>
+      <button class="btn btn-g" onclick="closePendModalDirect()">취소</button>
+      <button class="btn btn-p" onclick="savePending()">저장하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 미확정 보기 모달 -->
+<div class="dec-overlay" id="pendViewOverlay" onclick="closePendView(event)">
+  <div class="dec-modal" style="max-width:680px">
+    <div class="dec-modal-head">
+      <div class="dec-modal-head-title" id="pendViewTitle"></div>
+      <button class="modal-close" onclick="closePendViewDirect()">&#x2715;</button>
+    </div>
+    <div class="dec-modal-body">
+      <div id="pendViewContent" style="font-size:15px;color:#465770;line-height:1.8;white-space:pre-wrap"></div>
+    </div>
+    <div class="dec-modal-foot" style="justify-content:space-between">
+      <button class="btn btn-d btn-sm" onclick="deleteFromPendView()">삭제</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-g" onclick="closePendViewDirect()">닫기</button>
+        <button class="btn btn-o btn-sm" onclick="editFromPendView()">수정</button>
+      </div>
     </div>
   </div>
 </div>
@@ -339,6 +438,8 @@ function go(page,id,push){
   if(page==='detail')renderDetail(id);
   if(page==='decisions')loadDecisions();
   if(page==='decisions-all')loadDecisionsAll();
+  if(page==='pending')loadPending();
+  if(page==='pending-all')loadPendingAll();
 }
 window.addEventListener('popstate',function(e){
   var s=e.state;
@@ -396,11 +497,7 @@ function renderList(data){
         <div class="m-card-date">${fmtShort(m.date)}</div>
       </div>
       ${m.keywords&&m.keywords.length?'<div class="m-card-keywords">'+m.keywords.map(k=>'<span class="kw-chip">'+esc(k)+'</span>').join('')+'</div>':''}
-      <div class="m-card-actions" onclick="event.stopPropagation()">
-        <button class="btn btn-o btn-sm" onclick="go('detail','${m.id}')">보기</button>
-        <button class="btn btn-g btn-sm" onclick="go('write','${m.id}')">수정</button>
-        <button class="btn btn-d btn-sm" onclick="deleteMeeting('${m.id}')">삭제</button>
-      </div>
+
     </div>`).join('');
 }
 
@@ -484,7 +581,7 @@ async function renderDetail(id){
     '<div class="detail-doc-title">'+esc(m.title)+'</div>'+
     '<div class="detail-doc-meta"><span>📅 '+fmtDate(m.date)+'</span>'+(m.attendees&&m.attendees.length?'<span>'+m.attendees.join(', ')+'</span>':'')+'</div>'+
     (m.keywords&&m.keywords.length?'<div style="margin-top:10px;color:var(--sky-dk);font-size:14px;font-weight:600">'+m.keywords.join(' · ')+'</div>':'')+
-    '</div><div>'+sec('안건',m.agenda)+sec('주요 논의 내용',m.discussion)+sec('결정사항',m.decisions)+kwSec+'</div></div>';
+    '</div><div>'+sec('안건',m.agenda)+sec('주요 논의 내용',m.discussion)+sec('결정사항',m.decisions)+kwSec+'</div><div style="display:flex;justify-content:flex-end;padding:16px 28px;border-top:1px solid #C8D8E8;background:#F4F8FC"><button class="btn btn-o btn-sm" onclick="editCurrent()">수정</button></div></div>';
 }
 
 function editCurrent(){go('write',state.currentDetailId);}
@@ -525,21 +622,34 @@ function filterDecisions(){
   renderDecisions(filtered);
 }
 
+var decViewMode='card';
+function setDecView(mode){
+  decViewMode=mode;
+  document.getElementById('dec-toggle-card').classList.toggle('active',mode==='card');
+  document.getElementById('dec-toggle-list').classList.toggle('active',mode==='list');
+  filterDecisions();
+}
 function renderDecisions(data){
   document.getElementById('decCount').innerHTML='총 <strong>'+data.length+'개</strong>';
-  var grid=document.getElementById('decCards');
-  if(!data.length){grid.innerHTML='<div class="empty" style="grid-column:span 3"><div class="empty-icon">📋</div><p>결정사항이 없습니다</p><span>추가 버튼을 눌러 작성해보세요</span></div>';return;}
-  grid.innerHTML=data.map(d=>`
-    <div class="dec-card">
-      <div class="dec-card-title">${esc(d.title)}</div>
-      ${d.content?'<div class="dec-card-preview">'+esc(d.content)+'</div>':''}
-      <div class="dec-card-date">수정일: ${fmtDate(d.updatedAt?d.updatedAt.slice(0,10):d.createdAt?d.createdAt.slice(0,10):'')}</div>
-      <div class="dec-card-actions">
-        <button class="btn btn-o btn-sm" onclick="viewDecision('${d.id}')">보기</button>
-        <button class="btn btn-g btn-sm" onclick="openDecModal('${d.id}')">수정</button>
-        <button class="btn btn-d btn-sm" onclick="deleteDecision('${d.id}')">삭제</button>
-      </div>
-    </div>`).join('');
+  var container=document.getElementById('decCards');
+  if(!data.length){
+    container.className='m-grid';
+    container.innerHTML='<div class="empty" style="grid-column:span 3"><div class="empty-icon">📋</div><p>결정사항이 없습니다</p><span>추가 버튼을 눌러 작성해보세요</span></div>';
+    return;
+  }
+  if(decViewMode==='list'){
+    container.className='';
+    container.innerHTML='<table class="dec-table"><thead><tr><th>제목</th><th>내용</th></tr></thead><tbody>'+
+      data.map(d=>'<tr onclick="viewDecision(\''+d.id+'\')"><td class="td-title">'+esc(d.title)+'</td><td class="td-content">'+esc(d.content||'')+'</td></tr>').join('')+
+      '</tbody></table>';
+  } else {
+    container.className='dec-grid';
+    container.innerHTML=data.map(d=>`
+      <div class="dec-card" onclick="viewDecision('${d.id}')" style="cursor:pointer">
+        <div class="dec-card-title">${esc(d.title)}</div>
+        ${d.content?'<div class="dec-card-preview">'+esc(d.content)+'</div>':''}
+      </div>`).join('');
+  }
 }
 
 function openDecModal(id){
@@ -598,6 +708,10 @@ function viewDecision(id){
 function closeDecView(e){if(e.target===document.getElementById('decViewOverlay'))closeDecViewDirect();}
 function closeDecViewDirect(){document.getElementById('decViewOverlay').classList.remove('on');document.body.style.overflow='';}
 function editFromView(){closeDecViewDirect();openDecModal(decState.viewId);}
+function deleteFromView(){
+  closeDecViewDirect();
+  deleteDecision(decState.viewId);
+}
 
 async function deleteDecision(id){
   if(!confirm('삭제하시겠습니까?'))return;
@@ -651,6 +765,124 @@ function renderDecisionsAll(data){
       (content?'<div style="font-size:15px;color:#465770;line-height:1.8;white-space:pre-wrap">'+content+'</div>':'')+
       '</div>'+divider;
   }).join('');
+}
+
+/* ── 미확정 ── */
+var pendState = { items:[], editId:null, viewId:null };
+var pendViewMode = 'card';
+
+async function loadPending(){
+  document.getElementById('pendCards').innerHTML='<div class="spinner">불러오는 중...</div>';
+  try{
+    var res=await fetch(API+'/pending');
+    pendState.items=await res.json();
+    filterPending();
+  }catch(e){
+    document.getElementById('pendCards').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><p>서버에 연결할 수 없습니다</p></div>';
+  }
+}
+
+function filterPending(){
+  var q=document.getElementById('pendSearchInp').value.toLowerCase();
+  var filtered=pendState.items.filter(d=>!q||d.title&&d.title.toLowerCase().includes(q));
+  renderPending(filtered);
+}
+
+function setPendView(mode){
+  pendViewMode=mode;
+  document.getElementById('pend-toggle-card').classList.toggle('active',mode==='card');
+  document.getElementById('pend-toggle-list').classList.toggle('active',mode==='list');
+  filterPending();
+}
+
+function renderPending(data){
+  document.getElementById('pendCount').innerHTML='총 <strong>'+data.length+'개</strong>';
+  var container=document.getElementById('pendCards');
+  if(!data.length){
+    container.className='dec-grid';
+    container.innerHTML='<div class="empty" style="grid-column:span 3"><div class="empty-icon">❓</div><p>미확정 항목이 없습니다</p></div>';
+    return;
+  }
+  if(pendViewMode==='list'){
+    container.className='';
+    container.innerHTML='<table class="dec-table"><thead><tr><th>제목</th><th>내용</th></tr></thead><tbody>'+
+      data.map(d=>'<tr onclick="viewPending(\''+d.id+'\')"><td class="td-title">'+esc(d.title)+'</td><td class="td-content">'+esc(d.content||'')+'</td></tr>').join('')+
+      '</tbody></table>';
+  } else {
+    container.className='dec-grid';
+    container.innerHTML=data.map(d=>`
+      <div class="dec-card" onclick="viewPending('${d.id}')" style="cursor:pointer">
+        <div class="dec-card-title">${esc(d.title)}</div>
+        ${d.content?'<div class="dec-card-preview">'+esc(d.content)+'</div>':''}
+      </div>`).join('');
+  }
+}
+
+function openPendModal(id){
+  pendState.editId=id||null;
+  document.getElementById('pendModalTitle').textContent=id?'미확정 수정':'미확정 추가';
+  document.getElementById('pend-title').value='';
+  document.getElementById('pend-content').value='';
+  if(id){
+    var d=pendState.items.find(x=>x.id===id);
+    if(d){document.getElementById('pend-title').value=d.title||'';document.getElementById('pend-content').value=d.content||'';}
+  }
+  document.getElementById('pendOverlay').classList.add('on');
+  document.body.style.overflow='hidden';
+  setTimeout(function(){document.getElementById('pend-title').focus();},100);
+}
+function closePendModal(e){if(e.target===document.getElementById('pendOverlay'))closePendModalDirect();}
+function closePendModalDirect(){document.getElementById('pendOverlay').classList.remove('on');document.body.style.overflow='';}
+
+async function savePending(){
+  var title=document.getElementById('pend-title').value.trim();
+  if(!title){toast('⚠️ 제목을 입력해주세요.');document.getElementById('pend-title').focus();return;}
+  var payload={title:title,content:document.getElementById('pend-content').value.trim()};
+  try{
+    if(pendState.editId){
+      await fetch(API+'/pending/'+pendState.editId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      toast('✓ 수정되었습니다.');
+    }else{
+      await fetch(API+'/pending',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      toast('✓ 저장되었습니다.');
+    }
+    closePendModalDirect();
+    await loadPending();
+  }catch(e){toast('❌ 저장 실패');}
+}
+
+function viewPending(id){
+  var d=pendState.items.find(x=>x.id===id);
+  if(!d)return;
+  document.getElementById('pendViewTitle').textContent=d.title||'';
+  var content=esc(d.content||'').replace(/────────────────/g,'<hr style="border:none;border-top:2px solid #8A9BB0;margin:12px 0">');
+  document.getElementById('pendViewContent').innerHTML=content;
+  pendState.viewId=id;
+  document.getElementById('pendViewOverlay').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closePendView(e){if(e.target===document.getElementById('pendViewOverlay'))closePendViewDirect();}
+function closePendViewDirect(){document.getElementById('pendViewOverlay').classList.remove('on');document.body.style.overflow='';}
+function editFromPendView(){closePendViewDirect();openPendModal(pendState.viewId);}
+function deleteFromPendView(){closePendViewDirect();deletePending(pendState.viewId);}
+
+async function deletePending(id){
+  if(!confirm('삭제하시겠습니까?'))return;
+  try{await fetch(API+'/pending/'+id,{method:'DELETE'});toast('삭제되었습니다.');await loadPending();}catch(e){toast('❌ 삭제 실패');}
+}
+
+async function loadPendingAll(){
+  var el=document.getElementById('pendAllContent');
+  el.innerHTML='<div class="spinner">불러오는 중...</div>';
+  try{
+    if(!pendState.items.length){var res=await fetch(API+'/pending');pendState.items=await res.json();}
+    if(!pendState.items.length){el.innerHTML='<div class="empty"><div class="empty-icon">❓</div><p>미확정 항목이 없습니다</p></div>';return;}
+    el.innerHTML=pendState.items.map((d,i)=>{
+      var divider=i<pendState.items.length-1?'<hr style="border:none;border-top:2px solid #C8D8E8;margin:32px 0">':'';
+      var content=d.content?esc(d.content).replace(/────────────────/g,'<hr style="border:none;border-top:2px solid #8A9BB0;margin:12px 0">'):'';
+      return '<div><div style="font-size:20px;font-weight:800;letter-spacing:-.3px;color:#18242F">'+esc(d.title)+'</div><div style="height:16px"></div>'+(content?'<div style="font-size:15px;color:#465770;line-height:1.8;white-space:pre-wrap">'+content+'</div>':'')+'</div>'+divider;
+    }).join('');
+  }catch(e){el.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><p>서버에 연결할 수 없습니다</p></div>';}
 }
 window.addEventListener('beforeunload',function(){
   var page=document.querySelector('.page.on');

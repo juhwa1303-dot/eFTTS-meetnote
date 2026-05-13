@@ -110,3 +110,41 @@ app.delete('/api/decisions/:id', async (req, res) => {
     res.json({ success: true });
   } catch(e) { res.status(500).json({ error: '삭제 실패' }); }
 });
+
+// ── 미확정 스키마 ──────────────────────────
+const pendingSchema = new mongoose.Schema({
+  title:     { type: String, required: true },
+  content:   String,
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+const Pending = mongoose.model('Pending', pendingSchema);
+
+app.get('/api/pending', async (req, res) => {
+  try {
+    const data = await Pending.find().sort({ updatedAt: -1 });
+    res.json(data.map(d => ({ ...d.toObject(), id: d._id.toString() })));
+  } catch(e) { res.status(500).json({ error: '조회 실패' }); }
+});
+
+app.post('/api/pending', async (req, res) => {
+  try {
+    const d = await Pending.create(req.body);
+    res.status(201).json({ ...d.toObject(), id: d._id.toString() });
+  } catch(e) { res.status(500).json({ error: '저장 실패' }); }
+});
+
+app.put('/api/pending/:id', async (req, res) => {
+  try {
+    const d = await Pending.findByIdAndUpdate(req.params.id, { ...req.body, updatedAt: new Date() }, { new: true });
+    if (!d) return res.status(404).json({ error: '찾을 수 없습니다.' });
+    res.json({ ...d.toObject(), id: d._id.toString() });
+  } catch(e) { res.status(500).json({ error: '수정 실패' }); }
+});
+
+app.delete('/api/pending/:id', async (req, res) => {
+  try {
+    await Pending.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ error: '삭제 실패' }); }
+});
