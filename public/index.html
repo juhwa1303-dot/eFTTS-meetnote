@@ -86,8 +86,9 @@
     .m-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
     .m-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-md);padding:24px;display:flex;flex-direction:column;gap:12px;transition:var(--ease);cursor:pointer;min-height:180px}
     .m-card:hover{box-shadow:var(--sh-md);border-color:var(--sky-mid);transform:translateY(-2px)}
-    .m-card-actions{display:flex;justify-content:flex-end;margin-top:auto;padding-top:10px;opacity:0;transition:var(--ease)}
+    .m-card-actions{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:10px;opacity:0;transition:var(--ease)}
     .m-card:hover .m-card-actions{opacity:1}
+    .dec-card:hover .m-card-actions{opacity:1}
     .m-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
     .m-card-title{font-size:16px;font-weight:700;color:var(--text-1);line-height:1.4}
     .m-card-date{font-size:13px;color:var(--text-3);white-space:nowrap;flex-shrink:0}
@@ -494,6 +495,7 @@ function renderList(data){
       </div>
       ${m.keywords&&m.keywords.length?'<div style="border-top:1.5px solid #C8D8E8;padding-top:10px"><span class="m-card-kw-list">'+m.keywords.map(k=>'<span class="kw-chip">'+esc(k)+'</span>').join('<span style="color:var(--text-3);margin:0 4px">·</span>')+'</span></div>':''}
       <div class="m-card-actions" onclick="event.stopPropagation()">
+        <button class="btn btn-d btn-sm" onclick="deleteMeeting('${m.id}')">삭제</button>
         <button class="btn btn-o btn-sm" onclick="go('write','${m.id}')">수정</button>
       </div>
     </div>`).join('');
@@ -651,7 +653,7 @@ function renderDecisions(data){
         <div class="dec-card-title">${esc(d.title)}</div>
         <div style="border-top:1.5px solid #C8D8E8"></div>
         ${d.content?'<div class="dec-card-preview">'+esc(d.content)+'</div>':''}
-        <div class="m-card-actions" onclick="event.stopPropagation()"><button class="btn btn-o btn-sm" onclick="openDecModal('${d.id}')">수정</button></div>
+        <div class="m-card-actions" onclick="event.stopPropagation()"><button class="btn btn-d btn-sm" onclick="deleteDecision('${d.id}')">삭제</button><button class="btn btn-o btn-sm" onclick="openDecModal('${d.id}')">수정</button></div>
       </div>`).join('');
   }
 }
@@ -823,7 +825,7 @@ function renderPending(data){
         <div class="dec-card-title">${esc(d.title)}</div>
         <div style="border-top:1.5px solid #C8D8E8"></div>
         ${d.content?'<div class="dec-card-preview">'+esc(d.content)+'</div>':''}
-        <div class="m-card-actions" onclick="event.stopPropagation()"><button class="btn btn-o btn-sm" onclick="openPendModal('${d.id}')">수정</button></div>
+        <div class="m-card-actions" onclick="event.stopPropagation()"><button class="btn btn-d btn-sm" onclick="deletePending('${d.id}')">삭제</button><button class="btn btn-o btn-sm" onclick="openPendModal('${d.id}')">수정</button></div>
       </div>`).join('');
   }
 }
