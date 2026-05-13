@@ -493,7 +493,7 @@ function renderList(data){
         <div class="m-card-title">${esc(m.title)}</div>
         <div class="m-card-date">${fmtShort(m.date)}</div>
       </div>
-      ${m.keywords&&m.keywords.length?'<div style="border-top:2px solid var(--sky-mid);padding-top:10px"><span class="m-card-kw-list">'+m.keywords.map(k=>'<span class="kw-chip">'+esc(k)+'</span>').join('<span style="color:var(--text-3);margin:0 4px">·</span>')+'</span></div>':''}
+      ${m.keywords&&m.keywords.length?'<div style="border-top:2px solid var(--sky-dk);padding-top:10px"><span class="m-card-kw-list">'+m.keywords.map(k=>'<span class="kw-chip">'+esc(k)+'</span>').join('<span style="color:var(--text-3);margin:0 4px">·</span>')+'</span></div>':''}
       <div class="m-card-actions" onclick="event.stopPropagation()">
         <button class="btn btn-d btn-sm" onclick="deleteMeeting('${m.id}')">삭제</button>
         <button class="btn btn-o btn-sm" onclick="go('write','${m.id}')">수정</button>
@@ -651,7 +651,7 @@ function renderDecisions(data){
     container.innerHTML=data.map(d=>`
       <div class="dec-card" onclick="viewDecision('${d.id}')" style="cursor:pointer">
         <div class="dec-card-title">${esc(d.title)}</div>
-        <div style="border-top:2px solid var(--sky-mid)"></div>
+        <div style="border-top:2px solid var(--sky-dk)"></div>
         ${d.content?'<div class="dec-card-preview">'+esc(d.content)+'</div>':''}
         <div class="m-card-actions" onclick="event.stopPropagation()"><button class="btn btn-d btn-sm" onclick="deleteDecision('${d.id}')">삭제</button><button class="btn btn-o btn-sm" onclick="openDecModal('${d.id}')">수정</button></div>
       </div>`).join('');
@@ -823,7 +823,7 @@ function renderPending(data){
     container.innerHTML=data.map(d=>`
       <div class="dec-card" onclick="viewPending('${d.id}')" style="cursor:pointer">
         <div class="dec-card-title">${esc(d.title)}</div>
-        <div style="border-top:2px solid var(--sky-mid)"></div>
+        <div style="border-top:2px solid var(--sky-dk)"></div>
         ${d.content?'<div class="dec-card-preview">'+esc(d.content)+'</div>':''}
         <div class="m-card-actions" onclick="event.stopPropagation()"><button class="btn btn-d btn-sm" onclick="deletePending('${d.id}')">삭제</button><button class="btn btn-o btn-sm" onclick="openPendModal('${d.id}')">수정</button></div>
       </div>`).join('');
