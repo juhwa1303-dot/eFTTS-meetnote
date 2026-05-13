@@ -493,7 +493,7 @@ function renderList(data){
       </div>
       ${m.keywords&&m.keywords.length?'<div style="border-top:1.5px solid #C8D8E8;padding-top:10px"><span class="m-card-kw-list">'+m.keywords.map(k=>'<span class="kw-chip">'+esc(k)+'</span>').join('<span style="color:var(--text-3);margin:0 4px">·</span>')+'</span></div>':''}
       <div class="m-card-actions" onclick="event.stopPropagation()">
-        <button class="btn btn-o btn-sm" onclick="go('detail','${m.id}')">보기</button>
+        <button class="btn btn-o btn-sm" onclick="go('write','${m.id}')">수정</button>
       </div>
     </div>`).join('');
 }
@@ -650,6 +650,7 @@ function renderDecisions(data){
         <div class="dec-card-title">${esc(d.title)}</div>
         <div style="border-top:1.5px solid #C8D8E8"></div>
         ${d.content?'<div class="dec-card-preview">'+esc(d.content)+'</div>':''}
+        <div class="m-card-actions" onclick="event.stopPropagation()"><button class="btn btn-o btn-sm" onclick="openDecModal('${d.id}')">수정</button></div>
       </div>`).join('');
   }
 }
@@ -821,6 +822,7 @@ function renderPending(data){
         <div class="dec-card-title">${esc(d.title)}</div>
         <div style="border-top:1.5px solid #C8D8E8"></div>
         ${d.content?'<div class="dec-card-preview">'+esc(d.content)+'</div>':''}
+        <div class="m-card-actions" onclick="event.stopPropagation()"><button class="btn btn-o btn-sm" onclick="openPendModal('${d.id}')">수정</button></div>
       </div>`).join('');
   }
 }
