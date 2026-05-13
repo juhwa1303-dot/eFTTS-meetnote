@@ -85,6 +85,8 @@
     .m-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
     .m-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-md);padding:24px;display:flex;flex-direction:column;gap:12px;transition:var(--ease);cursor:pointer;min-height:180px}
     .m-card:hover{box-shadow:var(--sh-md);border-color:var(--sky-mid);transform:translateY(-2px)}
+    .m-card-actions{display:flex;justify-content:flex-end;margin-top:auto;padding-top:10px;opacity:0;transition:var(--ease)}
+    .m-card:hover .m-card-actions{opacity:1}
     .m-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
     .m-card-title{font-size:16px;font-weight:700;color:var(--text-1);line-height:1.4}
     .m-card-date{font-size:13px;color:var(--text-3);white-space:nowrap;flex-shrink:0}
@@ -574,7 +576,7 @@ async function renderDetail(id){
     '<div class="detail-doc-title">'+esc(m.title)+'</div>'+
     '<div class="detail-doc-meta"><span>📅 '+fmtDate(m.date)+'</span>'+(m.attendees&&m.attendees.length?'<span>'+m.attendees.join(', ')+'</span>':'')+'</div>'+
     (m.keywords&&m.keywords.length?'<div style="margin-top:10px;color:var(--sky-dk);font-size:14px;font-weight:600">'+m.keywords.join(' · ')+'</div>':'')+
-    '</div><div>'+sec('안건',m.agenda)+sec('주요 논의 내용',m.discussion)+sec('결정사항',m.decisions)+kwSec+'</div><div style="display:flex;justify-content:flex-end;padding:16px 28px;border-top:1px solid #C8D8E8;background:#F4F8FC"><button class="btn btn-o btn-sm" onclick="editCurrent()">수정</button></div></div>';
+    '</div><div>'+sec('안건',m.agenda)+sec('주요 논의 내용',m.discussion)+sec('결정사항',m.decisions)+kwSec+'</div><div style="display:flex;justify-content:space-between;align-items:center;padding:16px 28px;border-top:1px solid #C8D8E8;background:#F4F8FC"><button class="btn btn-d btn-sm" onclick="deleteCurrent()">삭제</button><button class="btn btn-o btn-sm" onclick="editCurrent()">수정</button></div></div>';
 }
 
 function editCurrent(){go('write',state.currentDetailId);}
