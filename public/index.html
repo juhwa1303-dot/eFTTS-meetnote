@@ -25,7 +25,7 @@
     .btn-sm{padding:6px 13px;font-size:13px}
     .btn-p{background:var(--sky);color:#fff;border:1.5px solid var(--sky)}
     .btn-p:hover{background:var(--sky-dk);border-color:var(--sky-dk);box-shadow:0 4px 14px rgba(91,171,245,.32);transform:translateY(-1px)}
-    .btn-o{background:transparent;color:var(--sky-dk);border:1.5px solid var(--sky-mid)}
+    .btn-o{background:var(--white);color:var(--sky-dk);border:1.5px solid var(--sky-mid)}
     .btn-o:hover{background:var(--sky-lt);border-color:var(--sky)}
     .btn-g{background:transparent;color:var(--text-2);border:1.5px solid transparent}
     .btn-g:hover{background:var(--border-lt)}
@@ -60,9 +60,8 @@
     .toolbar-btn{padding:3px 10px;border-radius:var(--r);font-size:12px;font-weight:600;color:var(--sky-dk);border:1.5px solid var(--sky-mid);background:var(--white);cursor:pointer;transition:var(--ease)}
     .toolbar-btn:hover{background:var(--sky-lt)}
 
-    .view-toggle{display:flex;gap:6px;background:var(--bg);border-radius:var(--r);padding:3px}
-    .toggle-btn{padding:5px 14px;border-radius:6px;font-size:13px;font-weight:600;color:var(--text-3);border:none;background:transparent;cursor:pointer;transition:var(--ease)}
-    .toggle-btn.active{background:var(--white);color:var(--sky-dk);box-shadow:var(--sh-sm)}
+    .view-toggle-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:var(--r);font-size:14px;font-weight:700;color:var(--sky-dk);border:1.5px solid var(--sky-mid);background:var(--white);cursor:pointer;transition:var(--ease)}
+    .view-toggle-btn:hover{background:var(--sky-lt);border-color:var(--sky)}
     .dec-table{width:100%;border-collapse:collapse;background:var(--white);border-radius:var(--r-md);overflow:hidden;border:1px solid var(--border)}
     .dec-table th{padding:12px 18px;background:var(--bg);font-size:12px;font-weight:800;color:var(--text-3);text-align:left;border-bottom:2px solid #C8D8E8;letter-spacing:.04em;text-transform:uppercase}
     .dec-table td{padding:14px 18px;font-size:14px;color:var(--text-2);border-bottom:1px solid var(--border-lt);vertical-align:top}
@@ -84,13 +83,13 @@
     .list-count{font-size:13px;color:var(--text-3);margin-bottom:16px}
     .list-count strong{color:var(--text-1);font-weight:700}
     .m-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    .m-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-md);padding:20px;display:flex;flex-direction:column;gap:10px;transition:var(--ease);cursor:pointer}
+    .m-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-md);padding:24px;display:flex;flex-direction:column;gap:12px;transition:var(--ease);cursor:pointer;min-height:120px}
     .m-card:hover{box-shadow:var(--sh-md);border-color:var(--sky-mid);transform:translateY(-2px)}
     .m-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
     .m-card-title{font-size:16px;font-weight:700;color:var(--text-1);line-height:1.4}
     .m-card-date{font-size:13px;color:var(--text-3);white-space:nowrap;flex-shrink:0}
     .m-card-keywords{display:flex;flex-wrap:wrap;gap:5px}
-    .kw-chip{background:var(--sky-lt);color:var(--sky-dk);padding:2px 9px;border-radius:20px;font-size:12px;font-weight:600}
+    .kw-chip{color:var(--sky-dk);font-size:13px;font-weight:600}
     .m-card-actions{display:flex;gap:6px;margin-top:auto;padding-top:8px;border-top:1px solid var(--border-lt);opacity:0;transition:var(--ease)}
     .m-card:hover .m-card-actions{opacity:1}
     .empty{grid-column:span 3;text-align:center;padding:60px 20px;color:var(--text-3)}
@@ -255,10 +254,7 @@
     <div class="dec-header">
       <div><div class="dec-title">결정사항</div></div>
       <div style="display:flex;gap:10px;align-items:center">
-        <div class="view-toggle">
-          <button class="toggle-btn active" id="dec-toggle-card" onclick="setDecView('card')">카드</button>
-          <button class="toggle-btn" id="dec-toggle-list" onclick="setDecView('list')">목록</button>
-        </div>
+        <button class="view-toggle-btn" id="dec-view-toggle-btn" onclick="setDecView()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg> 목록</button>
         <button class="btn btn-o" onclick="go('decisions-all')">전체보기</button>
         <button class="btn btn-p" onclick="openDecModal()">+ 추가</button>
       </div>
@@ -341,10 +337,7 @@
     <div class="dec-header">
       <div><div class="dec-title">미확정</div></div>
       <div style="display:flex;gap:10px;align-items:center">
-        <div class="view-toggle">
-          <button class="toggle-btn active" id="pend-toggle-card" onclick="setPendView('card')">카드</button>
-          <button class="toggle-btn" id="pend-toggle-list" onclick="setPendView('list')">목록</button>
-        </div>
+        <button class="view-toggle-btn" id="pend-view-toggle-btn" onclick="setPendView()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg> 목록</button>
         <button class="btn btn-o" onclick="go('pending-all')">전체보기</button>
         <button class="btn btn-p" onclick="openPendModal()">+ 추가</button>
       </div>
@@ -496,7 +489,7 @@ function renderList(data){
         <div class="m-card-title">${esc(m.title)}</div>
         <div class="m-card-date">${fmtShort(m.date)}</div>
       </div>
-      ${m.keywords&&m.keywords.length?'<div class="m-card-keywords">'+m.keywords.map(k=>'<span class="kw-chip">'+esc(k)+'</span>').join('')+'</div>':''}
+      ${m.keywords&&m.keywords.length?'<div style="border-top:1.5px solid #C8D8E8;padding-top:10px"><span class="m-card-kw-list">'+m.keywords.map(k=>'<span class="kw-chip">'+esc(k)+'</span>').join('<span style="color:var(--text-3);margin:0 4px">·</span>')+'</span></div>':''}
 
     </div>`).join('');
 }
@@ -623,10 +616,14 @@ function filterDecisions(){
 }
 
 var decViewMode='card';
-function setDecView(mode){
-  decViewMode=mode;
-  document.getElementById('dec-toggle-card').classList.toggle('active',mode==='card');
-  document.getElementById('dec-toggle-list').classList.toggle('active',mode==='list');
+function setDecView(){
+  decViewMode=decViewMode==='card'?'list':'card';
+  var btn=document.getElementById('dec-view-toggle-btn');
+  if(decViewMode==='list'){
+    btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> 카드';
+  }else{
+    btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg> 목록';
+  }
   filterDecisions();
 }
 function renderDecisions(data){
@@ -788,10 +785,14 @@ function filterPending(){
   renderPending(filtered);
 }
 
-function setPendView(mode){
-  pendViewMode=mode;
-  document.getElementById('pend-toggle-card').classList.toggle('active',mode==='card');
-  document.getElementById('pend-toggle-list').classList.toggle('active',mode==='list');
+function setPendView(){
+  pendViewMode=pendViewMode==='card'?'list':'card';
+  var btn=document.getElementById('pend-view-toggle-btn');
+  if(pendViewMode==='list'){
+    btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> 카드';
+  }else{
+    btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg> 목록';
+  }
   filterPending();
 }
 
