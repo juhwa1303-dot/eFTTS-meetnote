@@ -75,7 +75,9 @@
     .hamburger span{display:block;width:20px;height:2px;background:var(--text-1);border-radius:2px;transition:var(--ease)}
     .mobile-nav{display:none;flex-direction:column;position:fixed;top:var(--hh);left:0;right:0;background:var(--white);border-bottom:1px solid var(--border);box-shadow:var(--sh);z-index:99;padding:8px 0}
     .mobile-nav.on{display:flex}
-    .mobile-nav .nav-btn{padding:14px 24px;border-radius:0;font-size:15px;text-align:left;border-bottom:1px solid var(--border-lt)}
+    .mobile-nav .nav-btn{padding:14px 24px;border-radius:0;font-size:15px;text-align:right;border-bottom:1px solid var(--border-lt)}
+    .mobile-nav-overlay{display:none;position:fixed;inset:0;z-index:98;}
+    .mobile-nav-overlay.on{display:block}
     .mobile-nav .nav-btn:last-child{border-bottom:none}
     @media(max-width:600px){
       .nav{display:none}
@@ -178,8 +180,8 @@
   <button class="nav-btn" onclick="go('list');closeMobileNav()">회의록 목록</button>
   <button class="nav-btn" onclick="go('decisions');closeMobileNav()">결정사항</button>
   <button class="nav-btn" onclick="go('pending');closeMobileNav()">미확정</button>
-  <button class="nav-btn" onclick="go('write');closeMobileNav()">새 회의록</button>
 </div>
+<div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileNav()"></div>
 
 <div id="page-list" class="page">
   <div class="wrap">
@@ -927,10 +929,13 @@ async function loadPendingAll(){
 
 function toggleMobileNav(){
   var nav=document.getElementById('mobileNav');
+  var ov=document.getElementById('mobileNavOverlay');
   nav.classList.toggle('on');
+  ov.classList.toggle('on');
 }
 function closeMobileNav(){
   document.getElementById('mobileNav').classList.remove('on');
+  document.getElementById('mobileNavOverlay').classList.remove('on');
 }
 window.addEventListener('beforeunload',function(){
   var page=document.querySelector('.page.on');
