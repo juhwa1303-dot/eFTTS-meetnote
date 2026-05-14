@@ -47,7 +47,7 @@
     /* 결정사항 모달 */
     .dec-overlay{position:fixed;inset:0;z-index:200;background:rgba(18,28,42,.45);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:20px}
     .dec-overlay.on{display:flex}
-    .dec-modal{background:var(--white);border-radius:var(--r-lg);width:100%;max-width:600px;max-height:88vh;overflow-y:auto;box-shadow:0 16px 60px rgba(18,28,42,.22);animation:popIn .2s ease}
+    .dec-modal{background:var(--white);border-radius:var(--r-lg);width:100%;max-width:800px;max-height:88vh;overflow-y:auto;box-shadow:0 16px 60px rgba(18,28,42,.22);animation:popIn .2s ease}
     @keyframes popIn{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
     .dec-modal-head{padding:22px 24px 16px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;justify-content:space-between;gap:12px}
     .dec-modal-head-title{font-size:16px;font-weight:800}
@@ -57,7 +57,7 @@
     
     .dec-card-actions{opacity:1}}
 
-    .textarea-wrap{display:flex;flex-direction:column;gap:4px}
+    .textarea-wrap{display:flex;flex-direction:column;gap:4px;width:100%}
     .textarea-toolbar{display:flex;gap:6px}
     .toolbar-btn{padding:3px 10px;border-radius:var(--r);font-size:12px;font-weight:600;color:var(--sky-dk);border:1.5px solid var(--sky-mid);background:var(--white);cursor:pointer;transition:var(--ease)}
     .toolbar-btn:hover{background:var(--sky-lt)}
@@ -137,12 +137,12 @@
     .form{display:flex;flex-direction:column;gap:16px}
     .fsec{background:var(--white);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden}
     .fsec-head{padding:13px 22px;background:var(--bg);border-bottom:1px solid var(--border-lt);font-size:12px;font-weight:800;color:var(--sky-dk);letter-spacing:.05em;text-transform:uppercase}
-    .fsec-body{padding:20px 22px;display:flex;flex-direction:column;gap:14px}
+    .fsec-body{padding:20px 28px;display:flex;flex-direction:column;gap:14px}
     .fg2{display:grid;grid-template-columns:2fr 1fr;gap:14px}
     .fgroup{display:flex;flex-direction:column;gap:6px}
     .flabel{font-size:13px;font-weight:700;color:var(--text-2)}
     .flabel .req{color:var(--sky)}
-    .finput{padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--r);font-size:14px;color:var(--text-1);background:var(--white);transition:var(--ease)}
+    .finput{padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--r);font-size:14px;color:var(--text-1);background:var(--white);transition:var(--ease);width:100%}
     .finput:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px rgba(91,171,245,.11)}
     .finput::placeholder{color:var(--text-3)}
     textarea.finput{resize:vertical;min-height:100px;line-height:1.65}
@@ -357,7 +357,7 @@
 </div>
 <!-- 결정사항 보기 모달 -->
 <div class="dec-overlay" id="decViewOverlay" onclick="closeDecView(event)">
-  <div class="dec-modal" style="max-width:680px">
+  <div class="dec-modal" style="max-width:860px">
     <div class="dec-modal-head">
       <div class="dec-modal-head-title" id="decViewTitle"></div>
       <button class="modal-close" onclick="closeDecViewDirect()">&#x2715;</button>
@@ -440,7 +440,7 @@
 
 <!-- 미확정 보기 모달 -->
 <div class="dec-overlay" id="pendViewOverlay" onclick="closePendView(event)">
-  <div class="dec-modal" style="max-width:680px">
+  <div class="dec-modal" style="max-width:860px">
     <div class="dec-modal-head">
       <div class="dec-modal-head-title" id="pendViewTitle"></div>
       <button class="modal-close" onclick="closePendViewDirect()">&#x2715;</button>
