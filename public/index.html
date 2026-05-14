@@ -54,7 +54,7 @@
     .dec-modal-foot{padding:14px 24px;background:var(--bg);border-top:1px solid var(--border-lt);display:flex;justify-content:flex-end;gap:8px}
     .dec-view-val{font-size:15px;color:var(--text-2);line-height:1.8;white-space:pre-wrap;padding:4px 0}
     @media(max-width:900px){.dec-grid{grid-template-columns:repeat(2,1fr)}}
-    @media(max-width:600px){.dec-grid{grid-template-columns:1fr}.dec-card-actions{opacity:1}}
+    .dec-card-actions{opacity:1}}
 
     .textarea-wrap{display:flex;flex-direction:column;gap:4px}
     .textarea-toolbar{display:flex;gap:6px}
@@ -70,6 +70,25 @@
     .dec-table tr:hover td{background:var(--sky-lt);cursor:pointer}
     .dec-table .td-title{font-weight:700;color:var(--text-1);width:200px;flex-shrink:0}
     .dec-table .td-content{color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:400px}
+
+    .hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;padding:8px;cursor:pointer;background:none;border:none}
+    .hamburger span{display:block;width:20px;height:2px;background:var(--text-1);border-radius:2px;transition:var(--ease)}
+    .mobile-nav{display:none;flex-direction:column;position:fixed;top:var(--hh);left:0;right:0;background:var(--white);border-bottom:1px solid var(--border);box-shadow:var(--sh);z-index:99;padding:8px 0}
+    .mobile-nav.on{display:flex}
+    .mobile-nav .nav-btn{padding:14px 24px;border-radius:0;font-size:15px;text-align:left;border-bottom:1px solid var(--border-lt)}
+    .mobile-nav .nav-btn:last-child{border-bottom:none}
+    @media(max-width:600px){
+      .nav{display:none}
+      .hamburger{display:flex}
+      .wrap{padding:0 16px}
+      .m-grid{grid-template-columns:1fr}
+      .dec-grid{grid-template-columns:1fr}
+      .m-card-actions{opacity:1}
+      .dec-card:hover .m-card-actions{opacity:1}
+      .detail-doc-header{padding:20px}
+      .detail-sec{padding:16px 20px}
+      .fg2{grid-template-columns:1fr}
+    }
     .toast{position:fixed;bottom:24px;right:24px;background:var(--text-1);color:#fff;padding:12px 20px;border-radius:var(--r);font-size:14px;font-weight:500;box-shadow:var(--sh-md);z-index:9999;opacity:0;transform:translateY(12px);pointer-events:none;transition:.2s ease}
     .toast.on{opacity:1;transform:translateY(0)}
     .list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap}
@@ -138,7 +157,7 @@
     .detail-sec-label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--sky-dk);margin-bottom:10px}
     .detail-sec-val{font-size:15px;color:var(--text-2);line-height:1.8;white-space:pre-wrap}
     @media(max-width:900px){.m-grid{grid-template-columns:repeat(2,1fr)}.empty,.spinner{grid-column:span 2}}
-    @media(max-width:600px){.wrap{padding:0 16px}.m-grid{grid-template-columns:1fr}.empty,.spinner{grid-column:span 1}.fg2{grid-template-columns:1fr}.m-card-actions{opacity:1}.detail-doc-header{padding:20px}.detail-sec{padding:16px 20px}}
+    .m-grid{grid-template-columns:1fr}.empty,.spinner{grid-column:span 1}.fg2{grid-template-columns:1fr}.m-card-actions{opacity:1}.detail-doc-header{padding:20px}.detail-sec{padding:16px 20px}}
   </style>
 </head>
 <body>
@@ -150,8 +169,17 @@
       <button class="nav-btn" id="nav-decisions" onclick="go('decisions')">결정사항</button>
       <button class="nav-btn" id="nav-pending" onclick="go('pending')">미확정</button>
     </nav>
+    <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileNav()">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
+<div class="mobile-nav" id="mobileNav">
+  <button class="nav-btn" onclick="go('list');closeMobileNav()">회의록 목록</button>
+  <button class="nav-btn" onclick="go('decisions');closeMobileNav()">결정사항</button>
+  <button class="nav-btn" onclick="go('pending');closeMobileNav()">미확정</button>
+  <button class="nav-btn" onclick="go('write');closeMobileNav()">새 회의록</button>
+</div>
 
 <div id="page-list" class="page">
   <div class="wrap">
@@ -895,6 +923,14 @@ async function loadPendingAll(){
       return '<div><div style="font-size:20px;font-weight:800;letter-spacing:-.3px;color:#18242F">'+esc(d.title)+'</div><div style="height:16px"></div>'+(content?'<div style="font-size:15px;color:#465770;line-height:1.8;white-space:pre-wrap">'+content+'</div>':'')+'</div>'+divider;
     }).join('');
   }catch(e){el.innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><p>서버에 연결할 수 없습니다</p></div>';}
+}
+
+function toggleMobileNav(){
+  var nav=document.getElementById('mobileNav');
+  nav.classList.toggle('on');
+}
+function closeMobileNav(){
+  document.getElementById('mobileNav').classList.remove('on');
 }
 window.addEventListener('beforeunload',function(){
   var page=document.querySelector('.page.on');
